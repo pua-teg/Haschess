@@ -6,6 +6,8 @@ import Data.List.Split(chunksOf)
 import Data.Word(Word64)
 import Text.Printf
 
+import BitManipulation
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
@@ -32,16 +34,31 @@ initOf = tableDriven [tableDriven wInits, tableDriven bInits] where
   wInits = [0xff00, 0x42, 0x24, 0x81, 0x10, 0x8]
   bInits = map upsideDown wInits
 
-
-upsideDown :: BitBoard -> BitBoard
-upsideDown  = bitSwap 0xff00ff00ff00ff00 8 
-            . bitSwap 0xffff0000ffff0000 16 
-            . bitSwap 0xffffffff00000000 32
-
-bitSwap :: Bits a => a -> Int -> a -> a
-bitSwap selector n x =  let mask = (x `xor` x `shift` n) .&. selector
-                        in x `xor` mask `xor` mask `shift` (-n)
-
 view :: BitBoard -> IO ()
 view  = putStrLn . unlines . chunksOf 8 
       . zipWith (\n x -> bit n .&. x == 0 ? '0' ?? '1') [63, 62 .. 0] . repeat
+
+attack :: BitBoard -> BitBoard -> Color -> PieceType -> BitBoard
+attack pieces mover = tableDriven [
+  tableDriven [ (\x -> x `shift` 7 .&. 0x7f7f7f7f7f7f7f7f .|. x `shift` 9 .&. 0xfefefefefefefefe)
+              , (\x ->  x `shift` 15 .&. 0x7f7f7f7f7f7f7f7f
+                    .|. x `shift` 6 .&. 0x3f3f3f3f3f3f3f3f
+                    .|. x `shift` (-10) .&. 0x3f3f3f3f3f3f3f3f
+                    .|. x `shift` (-17) .&. 0x7f7f7f7f7f7f7f7f
+                    .|. x `shift` (-15) .&. 0xfefefefefefefefe
+                    .|. x `shift` (-6) .&. 0xfcfcfcfcfcfcfcfc
+                    .|. x `shift` 10 .&. 0xfcfcfcfcfcfcfcfc
+                    .|. x `shift` 17 .&. 0xfefefefefefefefe)
+              , (\x -> TODO)
+              , (\x -> TODO)
+              , (\x -> TODO)
+              , (\x ->  x `shift` 8 
+                    .|. x `shift` 7 .&. 0x7f7f7f7f7f7f7f7f
+                    .|. x `shift` (-1) .&. 0x7f7f7f7f7f7f7f7f
+                    .|. x `shift` (-9) .&. 0x7f7f7f7f7f7f7f7f
+                    .|. x `shift` (-7) .&. 0xfefefefefefefefe
+                    .|. x `shift` 1 .&. 0xfefefefefefefefe
+                    .|. x `shift` 9 .&. 0xfefefefefefefefe
+                    .|. x `shift` (-8))
+  ],
+  tableDriven [TODO]]
