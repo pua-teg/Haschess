@@ -12,7 +12,7 @@ type Destination = BitBoard
 
 data Direction  = NO | NNE | NE | ENE | EA | ESE | SE | SSE 
                 | SO | SSW | SW | WSW | WE | WNW | NW | NNW 
-                deriving (Bounded, Enum, Eq, Ord, Show)
+                deriving (Bounded, Enum, Eq, Show)
 
 
 
